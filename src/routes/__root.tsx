@@ -1,20 +1,35 @@
-import { createRootRoute, Link, Outlet } from '@tanstack/react-router'
+import { Separator } from '@/components/ui/separator'
+import { createRootRoute, Outlet, useRouterState } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 
-const RootLayout = () => (
-    <>
-        <div className="p-2 flex gap-2">
-            <Link to="/" className="[&.active]:font-bold">
-                Home
-            </Link>{' '}
-            <Link to="/about" className="[&.active]:font-bold">
-                About
-            </Link>
-        </div>
-        <hr />
-        <Outlet />
-        <TanStackRouterDevtools />
-    </>
-)
+export const Route = createRootRoute({
+    component: RootComponent,
+})
 
-export const Route = createRootRoute({ component: RootLayout })
+function RootComponent() {
+    const routerState = useRouterState()
+    const currentPath = routerState.location.pathname
+    const isProtectedRoute = currentPath.startsWith('/_backoffice') ||
+        currentPath.includes('/management')
+
+    if (isProtectedRoute) {
+        return (
+            <>
+                <Outlet />
+                <TanStackRouterDevtools />
+            </>
+        )
+    }
+
+    return (
+        <>
+            {/* <HeaderV2 /> */}
+            <div className="mt-16">
+                <Outlet />
+            </div>
+            <Separator />
+            {/*<Footer /> */}
+            <TanStackRouterDevtools />
+        </>
+    )
+}
