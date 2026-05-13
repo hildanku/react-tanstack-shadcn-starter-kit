@@ -4,7 +4,6 @@ import * as React from "react"
 import {
     BookOpen,
     Bot,
-    Command,
     Frame,
     LifeBuoy,
     Map,
@@ -23,10 +22,8 @@ import {
     SidebarContent,
     SidebarFooter,
     SidebarHeader,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
 } from "@/components/ui/sidebar"
+import { TeamSwitcher } from "@/components/team-switcher"
 
 const data = {
     user: {
@@ -154,23 +151,9 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     return (
-        <Sidebar variant="inset" {...props}>
+        <Sidebar collapsible="icon" {...props}>
             <SidebarHeader>
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                        <SidebarMenuButton size="lg" asChild>
-                            <a href="#">
-                                <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                                    <Command className="size-4" />
-                                </div>
-                                <div className="grid flex-1 text-left text-sm leading-tight">
-                                    <span className="truncate font-medium">Acme Inc</span>
-                                    <span className="truncate text-xs">Enterprise</span>
-                                </div>
-                            </a>
-                        </SidebarMenuButton>
-                    </SidebarMenuItem>
-                </SidebarMenu>
+                <TeamSwitcher />
             </SidebarHeader>
             <SidebarContent>
                 <NavMain items={data.navMain} />

@@ -1,13 +1,19 @@
 import { AppSidebar } from '@/components/app-sidebar'
-import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
-import { createFileRoute, Outlet } from '@tanstack/react-router'
+import { SiteHeader } from '@/components/header'
+import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar'
+import { isAuthenticated } from '@/lib/auth'
+import { createFileRoute, Outlet, redirect } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_backoffice')({
-    beforeLoad: async () => {
-        // middleware like:
-        // if (!isAuthenticated) {
-        //      redirect to balbalblalbla
-        // }
+    beforeLoad: ({ location }) => {
+        if (!isAuthenticated()) {
+            throw redirect({
+                to: '/login',
+                search: {
+                    redirect: location.pathname,
+                },
+            })
+        }
     },
     component: BackOfficeLayout,
 })
@@ -15,20 +21,25 @@ export const Route = createFileRoute('/_backoffice')({
 function BackOfficeLayout() {
     return (
         <>
-            <SidebarProvider>
-                <AppSidebar />
-                <main className="flex flex-col flex-1">
-                    <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-                        <SidebarTrigger className="-ml-1" />
-                        <div className="flex items-center gap-1">
-                            <h1 className="text-lg font-semibold">Starterkit - Back Office</h1>
+            <SidebarProvider
+                style={
+                    {
+                        "--sidebar-width": "calc(var(--spacing) * 72)",
+                        "--header-height": "calc(var(--spacing) * 12)",
+                    } as React.CSSProperties
+                }
+            >
+                <AppSidebar variant='inset' />
+                <SidebarInset>
+                    <SiteHeader />
+                    <main className="flex flex-col flex-1">
+                        <div className="@container/main flex flex-1 flex-col gap-2">
+                            <div className="flex-1 p-4">
+                                <Outlet />
+                            </div>
                         </div>
-                    </header>
-                    <div className="flex-1 p-4">
-                        <Outlet />
-                    </div>
-                </main>
-                {/* <TanStackRouterDevtools position="bottom-right"/> */}
+                    </main>
+                </SidebarInset>
             </SidebarProvider>
         </>
     )

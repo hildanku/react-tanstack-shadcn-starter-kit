@@ -12,7 +12,9 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as BlogRouteImport } from './routes/blog'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as BackofficeRouteImport } from './routes/_backoffice'
+import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as BackofficeManagementIndexRouteImport } from './routes/_backoffice/management/index'
 import { Route as BackofficeManagementUsersIndexRouteImport } from './routes/_backoffice/management/users/index'
 
@@ -30,10 +32,19 @@ const BackofficeRoute = BackofficeRouteImport.update({
   id: '/_backoffice',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/_auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AuthLoginRoute = AuthLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => AuthRoute,
 } as any)
 const BackofficeManagementIndexRoute =
   BackofficeManagementIndexRouteImport.update({
@@ -52,42 +63,55 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/blog': typeof BlogRoute
-  '/management': typeof BackofficeManagementIndexRoute
-  '/management/users': typeof BackofficeManagementUsersIndexRoute
+  '/login': typeof AuthLoginRoute
+  '/management/': typeof BackofficeManagementIndexRoute
+  '/management/users/': typeof BackofficeManagementUsersIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/blog': typeof BlogRoute
+  '/login': typeof AuthLoginRoute
   '/management': typeof BackofficeManagementIndexRoute
   '/management/users': typeof BackofficeManagementUsersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_auth': typeof AuthRouteWithChildren
   '/_backoffice': typeof BackofficeRouteWithChildren
   '/about': typeof AboutRoute
   '/blog': typeof BlogRoute
+  '/_auth/login': typeof AuthLoginRoute
   '/_backoffice/management/': typeof BackofficeManagementIndexRoute
   '/_backoffice/management/users/': typeof BackofficeManagementUsersIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/about' | '/blog' | '/management' | '/management/users'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/blog'
+    | '/login'
+    | '/management/'
+    | '/management/users/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/about' | '/blog' | '/management' | '/management/users'
+  to: '/' | '/about' | '/blog' | '/login' | '/management' | '/management/users'
   id:
     | '__root__'
     | '/'
+    | '/_auth'
     | '/_backoffice'
     | '/about'
     | '/blog'
+    | '/_auth/login'
     | '/_backoffice/management/'
     | '/_backoffice/management/users/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthRoute: typeof AuthRouteWithChildren
   BackofficeRoute: typeof BackofficeRouteWithChildren
   AboutRoute: typeof AboutRoute
   BlogRoute: typeof BlogRoute
@@ -112,8 +136,15 @@ declare module '@tanstack/react-router' {
     '/_backoffice': {
       id: '/_backoffice'
       path: ''
-      fullPath: ''
+      fullPath: '/'
       preLoaderRoute: typeof BackofficeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_auth': {
+      id: '/_auth'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -123,22 +154,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_auth/login': {
+      id: '/_auth/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof AuthLoginRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_backoffice/management/': {
       id: '/_backoffice/management/'
       path: '/management'
-      fullPath: '/management'
+      fullPath: '/management/'
       preLoaderRoute: typeof BackofficeManagementIndexRouteImport
       parentRoute: typeof BackofficeRoute
     }
     '/_backoffice/management/users/': {
       id: '/_backoffice/management/users/'
       path: '/management/users'
-      fullPath: '/management/users'
+      fullPath: '/management/users/'
       preLoaderRoute: typeof BackofficeManagementUsersIndexRouteImport
       parentRoute: typeof BackofficeRoute
     }
   }
 }
+
+interface AuthRouteChildren {
+  AuthLoginRoute: typeof AuthLoginRoute
+}
+
+const AuthRouteChildren: AuthRouteChildren = {
+  AuthLoginRoute: AuthLoginRoute,
+}
+
+const AuthRouteWithChildren = AuthRoute._addFileChildren(AuthRouteChildren)
 
 interface BackofficeRouteChildren {
   BackofficeManagementIndexRoute: typeof BackofficeManagementIndexRoute
@@ -156,6 +204,7 @@ const BackofficeRouteWithChildren = BackofficeRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthRoute: AuthRouteWithChildren,
   BackofficeRoute: BackofficeRouteWithChildren,
   AboutRoute: AboutRoute,
   BlogRoute: BlogRoute,

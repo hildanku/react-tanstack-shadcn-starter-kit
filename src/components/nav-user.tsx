@@ -6,6 +6,7 @@ import {
   LogOut,
   Sparkles,
 } from "lucide-react"
+import { useNavigate } from "@tanstack/react-router"
 
 import {
   Avatar,
@@ -27,6 +28,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { useSidebar } from "@/components/ui/sidebar-context"
+import { logout } from "@/lib/auth"
 
 export function NavUser({
   user,
@@ -38,6 +40,12 @@ export function NavUser({
   }
 }) {
   const { isMobile } = useSidebar()
+  const navigate = useNavigate()
+
+  const handleLogout = async () => {
+    logout()
+    await navigate({ to: "/login" })
+  }
 
   return (
     <SidebarMenu>
@@ -100,7 +108,7 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onSelect={() => void handleLogout()}>
               <LogOut />
               Log out
             </DropdownMenuItem>
